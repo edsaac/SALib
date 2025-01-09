@@ -206,13 +206,17 @@ def _nonuniform_scale_samples(params, bounds, dists):
                 conv_params[:, i] = params[:, i] * (b2 - b1) + b1
 
         elif dists[i] == "logunif":
-            conv_params[:, i] = sp.stats.loguniform.ppf(params[:, i], a=b1, b=b2)
+            conv_params[:, i] = sp.stats.loguniform.ppf(
+                params[:, i], a=b1, b=b2
+            )
 
         elif dists[i] == "norm":
             if b2 <= 0:
                 raise ValueError("""Normal distribution: stdev must be > 0""")
             else:
-                conv_params[:, i] = sp.stats.norm.ppf(params[:, i], loc=b1, scale=b2)
+                conv_params[:, i] = sp.stats.norm.ppf(
+                    params[:, i], loc=b1, scale=b2
+                )
 
         # Truncated normal distribution
         # parameters are lower bound and upper bound, mean and stdev
@@ -231,7 +235,11 @@ def _nonuniform_scale_samples(params, bounds, dists):
                 )
             else:
                 conv_params[:, i] = sp.stats.truncnorm.ppf(
-                    params[:, i], (b1 - b3) / b4, (b2 - b3) / b4, loc=b3, scale=b4
+                    params[:, i],
+                    (b1 - b3) / b4,
+                    (b2 - b3) / b4,
+                    loc=b3,
+                    scale=b4,
                 )
 
         # lognormal distribution (ln-space, not base-10)
@@ -239,7 +247,9 @@ def _nonuniform_scale_samples(params, bounds, dists):
         elif dists[i] == "lognorm":
             # checking for valid parameters
             if b2 <= 0:
-                raise ValueError("""Lognormal distribution: stdev must be > 0""")
+                raise ValueError(
+                    """Lognormal distribution: stdev must be > 0"""
+                )
             else:
                 conv_params[:, i] = np.exp(
                     sp.stats.norm.ppf(params[:, i], loc=b1, scale=b2)
@@ -247,7 +257,9 @@ def _nonuniform_scale_samples(params, bounds, dists):
 
         else:
             valid_dists = ["unif", "triang", "norm", "truncnorm", "lognorm"]
-            raise ValueError("Distributions: choose one of %s" % ", ".join(valid_dists))
+            raise ValueError(
+                "Distributions: choose one of %s" % ", ".join(valid_dists)
+            )
 
     return conv_params
 
@@ -271,7 +283,7 @@ def extract_group_names(p: Dict) -> Tuple:
     else:
         groups = p["groups"]
 
-    names = list(pd.unique(groups))
+    names = list(set(groups))
     number = len(names)
 
     return names, number
